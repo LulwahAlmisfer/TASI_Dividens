@@ -1,3 +1,16 @@
 spring:
     application:
         name: TASI_Dividens
+    datasource:
+        url: ${DB_URL:jdbc:postgresql://localhost:5432/dividend_db}
+        username: ${DB_USERNAME:db}
+        password: ${DB_PASSWORD:1234}
+        driver-class-name: org.postgresql.Driver
+
+    jpa:
+        hibernate:
+            ddl-auto: none
+        show-sql: true
+
+server:
+    port: 8080
