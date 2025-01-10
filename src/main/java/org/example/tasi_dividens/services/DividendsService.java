@@ -127,8 +127,7 @@ public class DividendsService {
         }
     }
 
-   // @Scheduled(cron = "0 0 6 * * ?") // Every day at 6:00 AM
-   @Scheduled(cron = "0 */5 * * * *") // test
+   @Scheduled(cron = "${dividends.job.cron}")
     public void fetchAndStoreDividendEvents() {
         List<DividendDto> data = fetchDividendDetails(); // already implemented
 
