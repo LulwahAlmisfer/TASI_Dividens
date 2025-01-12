@@ -116,13 +116,16 @@ public class DividendsService {
         }
     }
 
-    public void saveEventIfNotExists(String symbol, String type, LocalDate eventDate) {
-        boolean exists = repository.existsBySymbolAndTypeAndEventDate(symbol, type, eventDate);
+    public void saveEventIfNotExists(String symbol, String type, LocalDate eventDate, String companyName, Double amount) {
+        boolean exists = repository.existsBySymbolAndTypeAndEventDateAndAmount(symbol, type, eventDate,amount);
         if (!exists) {
             DividendEvent event = new DividendEvent();
             event.setSymbol(symbol);
             event.setType(type);
             event.setEventDate(eventDate);
+            event.setCompanyName(companyName);
+            event.setAmount(amount);
+
             repository.save(event);
         }
     }
@@ -133,12 +136,14 @@ public class DividendsService {
 
         for (DividendDto dto : data) {
             String symbol = dto.getSymbol();
+            String companyName = dto.getCompanyShotName();
+            Double amount = dto.getAmount();
 
             // dueDate
             if (dto.getDueDate() != null && !dto.getDueDate().isBlank()) {
                 try {
                     LocalDate due = LocalDate.parse(dto.getDueDate());
-                    saveEventIfNotExists(symbol, "dueDate", due);
+                    saveEventIfNotExists(symbol, "dueDate", due, companyName,amount);
                 } catch (Exception e) {
                     // add log todo
                 }
@@ -148,7 +153,7 @@ public class DividendsService {
             if (dto.getDistributionDate() != null && !dto.getDistributionDate().isBlank()) {
                 try {
                     LocalDate dist = LocalDate.parse(dto.getDistributionDate());
-                    saveEventIfNotExists(symbol, "distributionDate", dist);
+                    saveEventIfNotExists(symbol, "distributionDate", dist, companyName,amount);
                 } catch (Exception e) {
                     // add log later
                 }
