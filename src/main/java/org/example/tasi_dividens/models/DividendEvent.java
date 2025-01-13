@@ -1,12 +1,15 @@
 package org.example.tasi_dividens.models;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 @Data
 @Entity
+@NoArgsConstructor
 @Table(name = "dividend_events", uniqueConstraints = {
         @UniqueConstraint(columnNames = {"symbol", "type", "eventDate"})
 })
@@ -28,5 +31,12 @@ public class DividendEvent {
 
     private Double amount;
 
+    public DividendEvent(String symbol, String type, LocalDate eventDate, String companyName, Double amount) {
+        this.symbol = symbol;
+        this.type = type;
+        this.eventDate = eventDate;
+        this.companyName = companyName;
+        this.amount = amount;
+    }
 }
 
