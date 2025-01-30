@@ -1,5 +1,6 @@
 package org.example.tasi_dividens.models;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -37,6 +38,11 @@ public class DividendEvent {
         this.eventDate = eventDate;
         this.companyName = companyName;
         this.amount = amount;
+    }
+
+    @JsonProperty("imageUrl")
+    public String getImageUrl() {
+        return "https://web.alrajhi-capital.sa/stock-images/" + symbol + ".webp";
     }
 }
 
