@@ -264,11 +264,12 @@ public class DividendsService {
     }
 
     public List<DividendEvent> getAllEvents() {
+        LocalDate sixMonthsAgo = LocalDate.now().minusMonths(6);
         return repository.findAll()
                 .stream()
+                .filter(event -> event.getEventDate() != null && !event.getEventDate().isBefore(sixMonthsAgo))
                 .sorted(Comparator.comparing(DividendEvent::getEventDate).reversed())
                 .collect(Collectors.toList());
     }
-
 
 }

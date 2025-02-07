@@ -58,7 +58,7 @@ public class DividendEvent {
 
     @JsonProperty("imageUrl")
     public String getImageUrl() {
-        return "https://web.alrajhi-capital.sa/stock-images/" + symbol + ".webp";
+        return "https://cdn.marketcapof.com/images/" + symbol + ".SR.png";
     }
 }
 
