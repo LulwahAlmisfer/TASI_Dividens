@@ -20,4 +20,17 @@ server:
 
 dividends:
     job:
-        cron: ${DIVIDENDS_JOB_CRON:0 */5 * * * *}
+        cron: ${DIVIDENDS_JOB_CRON:0 */19 * * * *}
+
+notifications:
+    job:
+        cron: ${NOTIFICATIONS_JOB_CRON:0 */40 * * * *}
+
+apple:
+    url: https://api.push.apple.com/3/device/
+#    url: https://api.sandbox.push.apple.com/3/device/
+
+apns:
+     key: ${key}
+     key-id: ${key-id}
+     team-id: ${team-id}
