@@ -23,7 +23,8 @@ public class SubscriptionService {
     }
 
     public void saveSubscription(String token, String companySymbol) {
-        String sql = "INSERT INTO device_subscription (device_token, company_symbol) VALUES (?, ?)";
+        String sql = "INSERT INTO device_subscription (device_token, company_symbol) VALUES (?, ?) " +
+                "ON CONFLICT (device_token, company_symbol) DO NOTHING";
         jdbcTemplate.update(sql, token, companySymbol);
     }
 
