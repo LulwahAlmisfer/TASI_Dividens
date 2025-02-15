@@ -15,6 +15,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
+
+import javax.xml.crypto.Data;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -70,7 +72,9 @@ public class DividendsService {
         MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();
         formData.add("searchType", "searchData");
         formData.add("marketsListId", "M");
-        formData.add("fromDate", "23-04-2025");
+        LocalDate yesterday = LocalDate.now().minusDays(1);
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+        formData.add("fromDate", yesterday.format(formatter));
         formData.add("toDate", "");
         formData.add("companySymbol", "");
         formData.add("sector", "");
