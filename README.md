@@ -10,3 +10,10 @@ CREATE TABLE dividend_events (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT unique_event UNIQUE (symbol, type, event_date)
 );
+
+
+CREATE TABLE device_subscription (
+    device_token   VARCHAR(255) NOT NULL,
+    company_symbol VARCHAR(50)  NOT NULL,
+    PRIMARY KEY (device_token, company_symbol)
+);
