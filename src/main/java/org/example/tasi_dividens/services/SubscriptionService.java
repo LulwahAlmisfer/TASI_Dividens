@@ -28,9 +28,15 @@ public class SubscriptionService {
         jdbcTemplate.update(sql, token, companySymbol);
     }
 
+    public  void  unsubscribe(String token, String companySymbol) {
+        log.info("Unsubscribing from device subscription");
+        String sql = "DELETE FROM device_subscription WHERE device_token = ? AND company_symbol = ?";
+        jdbcTemplate.update(sql, token, companySymbol);
+    }
+
     @Scheduled(cron = "${notifications.job.cron}")
     public void notifyForTodayEvents() {
-
+        try {
         log.info("start notifyForTodayEvents: ");
         String sqlEvents = """
         SELECT id, symbol, company_name, type, amount, event_date
@@ -82,6 +88,10 @@ public class SubscriptionService {
             }
 
         }
-    }
 
-}
+        } catch (Exception e) {
+            log.error("Push notification failed: {}", e.getMessage(), e);
+            throw e;
+        }
+    }
+    }

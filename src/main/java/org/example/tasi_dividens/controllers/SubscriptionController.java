@@ -18,4 +18,10 @@ public class SubscriptionController {
     public void subscribe(@RequestBody SubscriptionRequest request) {
         service.saveSubscription(request.getDeviceToken(), request.getCompanySymbol());
     }
+
+
+    @PostMapping("/unSubscribe")
+    public void unSubscribe(@RequestBody SubscriptionRequest request) {
+        service.unsubscribe(request.getDeviceToken(), request.getCompanySymbol());
+    }
 }
