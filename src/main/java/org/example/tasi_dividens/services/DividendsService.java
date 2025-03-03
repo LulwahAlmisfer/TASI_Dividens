@@ -101,7 +101,7 @@ public class DividendsService {
         headers.set("sec-fetch-site", "same-origin");
         headers.set("user-agent", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36");
         headers.set("x-requested-with", "XMLHttpRequest");
-        headers.set("cookie", "asdfghj");
+        headers.set("cookie", "_ga=GA1.1.1056105971.1752576755; BIGipServerSaudiExchange.sa.app~SaudiExchange.sa_pool=2600407468.20480.0000; __utma=44173222.1056105971.1752576755.1757874312.1757874312.1; __utmc=44173222; __utmz=44173222.1757874312.1.1.utmcsr=(direct)|utmccn=(direct)|utmcmd=(none); com.ibm.wps.state.preprocessors.locale.LanguageCookie=ar; JSESSIONID=!NW3UKzJms6XCXE9LU5wxdB6jNS4wIwVT2u/qRkxRi04rbr077Y7pnNVIPIHdxpgVahHEx54UcW4s3AuWZhqcPXi75HVvIApLNhI2; TS01fdeb15=0102d17fad5057909bf5f466d2195c89cab238e1835981e98a4a0b041b015b0eaddb8bc302cd4f164aa2d9f6b4c3c7775b0a506d8441ff1b5bf4c9938e01ea354be2fb99af7a964176cf70a358f4f8299d01b42f997da43141786827884e1155d7fb53b127; _ga_P0MCK0BGCX=GS2.1.s1758483126$o18$g0$t1758483150$j36$l0$h0; _ga_DC6H7ZFCGP=GS2.1.s1758483126$o18$g0$t1758483150$j36$l0$h0; RT=\"z=1&dm=www.saudiexchange.sa&si=bdbea857-1cc0-4453-bab4-db80f0c35e69&ss=mfu3g0x8&sl=1&tt=a89&rl=1\"\n");
 
         HttpEntity<MultiValueMap<String, String>> requestEntity = new HttpEntity<>(formData, headers);
         ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.POST, requestEntity, String.class);
