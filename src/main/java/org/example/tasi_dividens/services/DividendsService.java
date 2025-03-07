@@ -153,11 +153,11 @@ public class DividendsService {
 
 
     public void bulkInsertEvents(List<DividendEvent> events) {
-        String sql = "INSERT INTO dividend_events (symbol, type, event_date, company_name, amount, holding_time, holding_site, holding_type) VALUES (?, ?, ?, ?, ?, ?, ?, ?) " +
+        String sql = "INSERT INTO dividend_events (symbol, type, event_date, company_name, amount, holding_time, holding_site, holding_type, annUrl) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?) " +
                 "ON CONFLICT (symbol, type, event_date) DO NOTHING";
 
         List<Object[]> batch = events.stream()
-                .map(e -> new Object[]{e.getSymbol(), e.getType(), e.getEventDate(), e.getCompanyName(), e.getAmount(),e.getHoldingTime(),e.getHoldingSite(),e.getHoldingType()})
+                .map(e -> new Object[]{e.getSymbol(), e.getType(), e.getEventDate(), e.getCompanyName(), e.getAmount(),e.getHoldingTime(),e.getHoldingSite(),e.getHoldingType(), e.getAnnUrl()})
                 .toList();
 
         jdbcTemplate.batchUpdate(sql, batch);
@@ -251,6 +251,7 @@ public class DividendsService {
             String holdingTime = dto.getHoldingDt();
             String holdingSite = dto.getHoldingSite();
             String holdingType = dto.getNatureOfGenMetng();
+            String annUrl = dto.getAnnUrl();
             if (holdingType.contains("غير")) {
                 holdingType = "UnNatural";
             } else {
@@ -260,7 +261,7 @@ public class DividendsService {
             if (dto.getHoldingDt() != null && !dto.getHoldingDt().isBlank()) {
                 try {
                     LocalDate holdingDt = LocalDate.parse(dto.getHoldingDt());
-                    toInsert.add(new DividendEvent(symbol, "assembly", holdingDt, companyName, 0.0,holdingTime,holdingSite,holdingType));
+                    toInsert.add(new DividendEvent(symbol, "assembly", holdingDt, companyName, 0.0,holdingTime,holdingSite,holdingType,annUrl));
                 } catch (Exception ignored) {}
             }
 
