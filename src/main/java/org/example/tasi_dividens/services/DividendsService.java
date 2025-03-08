@@ -157,7 +157,7 @@ public class DividendsService {
                 "ON CONFLICT (symbol, type, event_date) DO NOTHING";
 
         List<Object[]> batch = events.stream()
-                .map(e -> new Object[]{e.getSymbol(), e.getType(), e.getEventDate(), e.getCompanyName(), e.getAmount(),e.getHoldingTime(),e.getHoldingSite(),e.getHoldingType(), e.getAnnUrl()})
+                .map(e -> new Object[]{e.getSymbol(), e.getType(), e.getEventDate(), e.getCompanyName(), e.getAmount(),e.getHoldingTime(),e.getHoldingSite(),e.getHoldingType(), e.getAnnurl()})
                 .toList();
 
         jdbcTemplate.batchUpdate(sql, batch);
