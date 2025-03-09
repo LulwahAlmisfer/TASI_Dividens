@@ -50,9 +50,9 @@ public class DividendsService {
         HttpHeaders headers = getHttpHeaders();
 
         HttpEntity<MultiValueMap<String, String>> requestEntity = new HttpEntity<>(formData, headers);
-        ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.POST, requestEntity, String.class);
 
         try {
+            ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.POST, requestEntity, String.class);
             JsonNode root = objectMapper.readTree(response.getBody());
             JsonNode data = root.path("data");
 
@@ -87,24 +87,22 @@ public class DividendsService {
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
         headers.set("accept", "application/json, text/javascript, */*; q=0.01");
         headers.set("accept-language", "en-US,en;q=0.9");
-        headers.set("dnt", "1");
         headers.set("origin", "https://www.saudiexchange.sa");
         headers.set("priority", "u=1, i");
         headers.set("referer", "https://www.saudiexchange.sa/wps/portal/saudiexchange/newsandreports/issuer-financial-calendars/general-assembly-meetings");
-        headers.set("sec-ch-ua", "\"Chromium\";v=\"135\", \"Not-A.Brand\";v=\"8\"");
+        headers.set("sec-ch-ua", "\"Not(A:Brand\";v=\"8\", \"Chromium\";v=\"144\"");
         headers.set("sec-ch-ua-mobile", "?0");
         headers.set("sec-ch-ua-platform", "\"macOS\"");
         headers.set("sec-fetch-dest", "empty");
         headers.set("sec-fetch-mode", "cors");
         headers.set("sec-fetch-site", "same-origin");
-        headers.set("user-agent", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36");
+        headers.set("user-agent", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36");
         headers.set("x-requested-with", "XMLHttpRequest");
-        headers.set("cookie", "abc");
 
         HttpEntity<MultiValueMap<String, String>> requestEntity = new HttpEntity<>(formData, headers);
-        ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.POST, requestEntity, String.class);
 
         try {
+            ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.POST, requestEntity, String.class);
             JsonNode root = objectMapper.readTree(response.getBody());
             JsonNode data = root.path("data");
 
@@ -119,7 +117,7 @@ public class DividendsService {
     private static MultiValueMap<String, String> getDividendDetailsBody(String marketsListId) {
         MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();
         formData.add("symbolorcompany", "");
-        formData.add("start", "05-03-2020");
+        formData.add("start", "05-03-2025");
         String today = LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy"));
         formData.add("end", today);
         formData.add("marketsListId", marketsListId);
@@ -135,19 +133,17 @@ public class DividendsService {
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
         headers.set("accept", "application/json, text/javascript, */*; q=0.01");
         headers.set("accept-language", "en-US,en;q=0.9");
-        headers.set("dnt", "1");
         headers.set("origin", "https://www.saudiexchange.sa");
         headers.set("priority", "u=1, i");
-        headers.set("referer", "https://www.saudiexchange.sa/wps/portal/saudiexchange/newsandreports/issuer-financial-calendars/dividends");
-        headers.set("sec-ch-ua", "\"Not:A-Brand\";v=\"24\", \"Chromium\";v=\"134\"");
+        headers.set("referer", "https://www.saudiexchange.sa/wps/portal/saudiexchange/newsandreports/issuer-financial-calendars/dividends?locale=ar");
+        headers.set("sec-ch-ua", "\"Not(A:Brand\";v=\"8\", \"Chromium\";v=\"144\"");
         headers.set("sec-ch-ua-mobile", "?0");
         headers.set("sec-ch-ua-platform", "\"macOS\"");
         headers.set("sec-fetch-dest", "empty");
         headers.set("sec-fetch-mode", "cors");
         headers.set("sec-fetch-site", "same-origin");
-        headers.set("user-agent", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36");
+        headers.set("user-agent", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36");
         headers.set("x-requested-with", "XMLHttpRequest");
-        headers.set("cookie", "asdfghj");
         return headers;
     }
 
