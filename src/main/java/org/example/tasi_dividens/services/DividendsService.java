@@ -3,11 +3,14 @@ package org.example.tasi_dividens.services;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.example.tasi_dividens.models.DividendDto;
+import org.example.tasi_dividens.models.DividendEvent;
+import org.example.tasi_dividens.repositories.DividendEventRepository;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.springframework.http.*;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
@@ -20,13 +23,42 @@ import java.util.List;
 @Service
 public class DividendsService {
 
-    private final RestTemplate restTemplate = new RestTemplate();
 
-    private final ObjectMapper objectMapper = new ObjectMapper();
+    private final RestTemplate restTemplate;
+    private final ObjectMapper objectMapper;
+    private final DividendEventRepository repository;
+
+    public DividendsService(RestTemplate restTemplate, ObjectMapper objectMapper, DividendEventRepository repository) {
+        this.restTemplate = restTemplate;
+        this.objectMapper = objectMapper;
+        this.repository = repository;
+    }
+
 
     public List<DividendDto> fetchDividendDetails() {
         String url = "https://www.saudiexchange.sa/wps/portal/saudiexchange/newsandreports/issuer-financial-calendars/dividends/!ut/p/z1/04_Sj9CPykssy0xPLMnMz0vMAfIjo8ziTR3NDIw8LAz8LTw8zA0C3bw9LTyDvAwMAoz1w9EU-LqbGQT6OQb6G5mbGriHGehHkaTfIDjAFKggwNfYxyDIwN3AjDj9BjiAIxH2R-FV4mOGoQDTi6gKsPgBrACPI4MTi_QLckNDIwwyPXUdFRUBgmVDWw!!/p0/IZ7_5A602H80OOMQC0604RU6VD10J3=CZ6_5A602H80O8HH70QFKI8IRJ00P3=NJgetDividendsDetails=/";
 
+        // Body
+        MultiValueMap<String, String> formData = getDividendDetailsBody();
+        // Headers
+        HttpHeaders headers = getHttpHeaders();
+
+        HttpEntity<MultiValueMap<String, String>> requestEntity = new HttpEntity<>(formData, headers);
+        ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.POST, requestEntity, String.class);
+
+        try {
+            JsonNode root = objectMapper.readTree(response.getBody());
+            JsonNode data = root.path("data");
+
+            return objectMapper.readerForListOf(DividendDto.class).readValue(data);
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            return List.of();
+        }
+
+    }
+
+    private static MultiValueMap<String, String> getDividendDetailsBody() {
         MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();
         formData.add("symbolorcompany", "");
         formData.add("start", "05-03-2020");
@@ -37,8 +69,10 @@ public class DividendsService {
         formData.add("period", "CUSTOM");
         formData.add("bySymbol", "");
         formData.add("market", "");
+        return formData;
+    }
 
-        // Headers
+    private static HttpHeaders getHttpHeaders() {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
         headers.set("accept", "application/json, text/javascript, */*; q=0.01");
@@ -56,20 +90,7 @@ public class DividendsService {
         headers.set("user-agent", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36");
         headers.set("x-requested-with", "XMLHttpRequest");
         headers.set("cookie", "asdfghj");
-
-        HttpEntity<MultiValueMap<String, String>> requestEntity = new HttpEntity<>(formData, headers);
-        ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.POST, requestEntity, String.class);
-
-        try {
-            JsonNode root = objectMapper.readTree(response.getBody());
-            JsonNode data = root.path("data");
-
-            return objectMapper.readerForListOf(DividendDto.class).readValue(data);
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
-            return List.of();
-        }
-
+        return headers;
     }
 
     // TASI website uses AJAX so this is not useful
@@ -95,6 +116,51 @@ public class DividendsService {
         }
     }
 
+    public void saveEventIfNotExists(String symbol, String type, LocalDate eventDate) {
+        boolean exists = repository.existsBySymbolAndTypeAndEventDate(symbol, type, eventDate);
+        if (!exists) {
+            DividendEvent event = new DividendEvent();
+            event.setSymbol(symbol);
+            event.setType(type);
+            event.setEventDate(eventDate);
+            repository.save(event);
+        }
+    }
 
+   // @Scheduled(cron = "0 0 6 * * ?") // Every day at 6:00 AM
+   @Scheduled(cron = "0 */5 * * * *") // test
+    public void fetchAndStoreDividendEvents() {
+        List<DividendDto> data = fetchDividendDetails(); // already implemented
+
+        for (DividendDto dto : data) {
+            String symbol = dto.getSymbol();
+
+            // dueDate
+            if (dto.getDueDate() != null && !dto.getDueDate().isBlank()) {
+                try {
+                    LocalDate due = LocalDate.parse(dto.getDueDate());
+                    saveEventIfNotExists(symbol, "dueDate", due);
+                } catch (Exception e) {
+                    // add log todo
+                }
+            }
+
+            // distributionDate
+            if (dto.getDistributionDate() != null && !dto.getDistributionDate().isBlank()) {
+                try {
+                    LocalDate dist = LocalDate.parse(dto.getDistributionDate());
+                    saveEventIfNotExists(symbol, "distributionDate", dist);
+                } catch (Exception e) {
+                    // add log later
+                }
+            }
+        }
+
+        System.out.println("✅ Dividend job finished: " + LocalDate.now());
+    }
+
+    public List<DividendEvent> getAllEvents() {
+        return repository.findAll();
+    }
 
 }
