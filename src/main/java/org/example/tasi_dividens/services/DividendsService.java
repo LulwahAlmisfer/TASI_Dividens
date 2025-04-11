@@ -10,6 +10,7 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.springframework.http.*;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
@@ -18,6 +19,7 @@ import org.springframework.web.client.RestTemplate;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -27,11 +29,13 @@ public class DividendsService {
     private final RestTemplate restTemplate;
     private final ObjectMapper objectMapper;
     private final DividendEventRepository repository;
+    private final JdbcTemplate jdbcTemplate;
 
-    public DividendsService(RestTemplate restTemplate, ObjectMapper objectMapper, DividendEventRepository repository) {
+    public DividendsService(RestTemplate restTemplate, ObjectMapper objectMapper, DividendEventRepository repository,JdbcTemplate jdbcTemplate) {
         this.restTemplate = restTemplate;
         this.objectMapper = objectMapper;
         this.repository = repository;
+        this.jdbcTemplate = jdbcTemplate;
     }
 
 
@@ -93,75 +97,86 @@ public class DividendsService {
         return headers;
     }
 
-    // TASI website uses AJAX so this is not useful
-    public void scrape() throws IOException {
-        String url = "https://www.saudiexchange.sa/wps/portal/saudiexchange/newsandreports/issuer-financial-calendars/dividends";
+//    // TASI website uses AJAX so this is not useful
+//    public void scrape() throws IOException {
+//        String url = "https://www.saudiexchange.sa/wps/portal/saudiexchange/newsandreports/issuer-financial-calendars/dividends";
+//
+//        Document doc = Jsoup.connect(url)
+//                .userAgent("PostmanRuntime/7.43.2")
+//                .header("Media-Type","text/plain")
+//                .referrer("https://www.google.com")
+//                .header("Accept","*/*")
+//                .header("Accept-Encoding","gzip, deflate, br")
+//                .header("Connection","keep-alive")
+//                .cookie("h","d")
+//                .timeout(1000)
+//                .get();
+//
+//        Elements rows = doc.select("table tr");
+//        System.out.println(rows);
+//        for (Element row : rows) {
+//            Elements cols = row.select("td");
+//            System.out.println(cols);
+//        }
+//    }
 
-        Document doc = Jsoup.connect(url)
-                .userAgent("PostmanRuntime/7.43.2")
-                .header("Media-Type","text/plain")
-                .referrer("https://www.google.com")
-                .header("Accept","*/*")
-                .header("Accept-Encoding","gzip, deflate, br")
-                .header("Connection","keep-alive")
-                .cookie("h","d")
-                .timeout(1000)
-                .get();
+//    public void saveEventIfNotExists(String symbol, String type, LocalDate eventDate, String companyName, Double amount) {
+//        boolean exists = repository.existsBySymbolAndTypeAndEventDateAndAmount(symbol, type, eventDate,amount);
+//        if (!exists) {
+//            DividendEvent event = new DividendEvent();
+//            event.setSymbol(symbol);
+//            event.setType(type);
+//            event.setEventDate(eventDate);
+//            event.setCompanyName(companyName);
+//            event.setAmount(amount);
+//
+//            repository.save(event);
+//        }
+//    }
 
-        Elements rows = doc.select("table tr");
-        System.out.println(rows);
-        for (Element row : rows) {
-            Elements cols = row.select("td");
-            System.out.println(cols);
-        }
+    public void bulkInsertEvents(List<DividendEvent> events) {
+        String sql = "INSERT INTO dividend_events (symbol, type, event_date, company_name, amount) VALUES (?, ?, ?, ?, ?) " +
+                "ON CONFLICT (symbol, type, event_date) DO NOTHING";
+
+        List<Object[]> batch = events.stream()
+                .map(e -> new Object[]{e.getSymbol(), e.getType(), e.getEventDate(), e.getCompanyName(), e.getAmount()})
+                .toList();
+
+        jdbcTemplate.batchUpdate(sql, batch);
     }
 
-    public void saveEventIfNotExists(String symbol, String type, LocalDate eventDate, String companyName, Double amount) {
-        boolean exists = repository.existsBySymbolAndTypeAndEventDateAndAmount(symbol, type, eventDate,amount);
-        if (!exists) {
-            DividendEvent event = new DividendEvent();
-            event.setSymbol(symbol);
-            event.setType(type);
-            event.setEventDate(eventDate);
-            event.setCompanyName(companyName);
-            event.setAmount(amount);
-
-            repository.save(event);
-        }
-    }
 
    @Scheduled(cron = "${dividends.job.cron}")
-    public void fetchAndStoreDividendEvents() {
-        List<DividendDto> data = fetchDividendDetails(); // already implemented
+   public void fetchAndStoreDividendEvents() {
+       List<DividendDto> data = fetchDividendDetails();
 
-        for (DividendDto dto : data) {
-            String symbol = dto.getSymbol();
-            String companyName = dto.getCompanyShotName();
-            Double amount = dto.getAmount();
+       List<DividendEvent> toInsert = new ArrayList<>();
 
-            // dueDate
-            if (dto.getDueDate() != null && !dto.getDueDate().isBlank()) {
-                try {
-                    LocalDate due = LocalDate.parse(dto.getDueDate());
-                    saveEventIfNotExists(symbol, "dueDate", due, companyName,amount);
-                } catch (Exception e) {
-                    // add log todo
-                }
-            }
+       for (DividendDto dto : data) {
+           String symbol = dto.getSymbol();
+           String companyName = dto.getCompanyShotName();
+           Double amount = dto.getAmount();
 
-            // distributionDate
-            if (dto.getDistributionDate() != null && !dto.getDistributionDate().isBlank()) {
-                try {
-                    LocalDate dist = LocalDate.parse(dto.getDistributionDate());
-                    saveEventIfNotExists(symbol, "distributionDate", dist, companyName,amount);
-                } catch (Exception e) {
-                    // add log later
-                }
-            }
-        }
+           if (dto.getDueDate() != null && !dto.getDueDate().isBlank()) {
+               try {
+                   LocalDate due = LocalDate.parse(dto.getDueDate());
+                   toInsert.add(new DividendEvent(symbol, "dueDate", due, companyName, amount));
+               } catch (Exception ignored) {}
+           }
 
-        System.out.println("✅ Dividend job finished: " + LocalDate.now());
-    }
+           if (dto.getDistributionDate() != null && !dto.getDistributionDate().isBlank()) {
+               try {
+                   LocalDate dist = LocalDate.parse(dto.getDistributionDate());
+                   toInsert.add(new DividendEvent(symbol, "distributionDate", dist, companyName, amount));
+               } catch (Exception ignored) {}
+           }
+       }
+
+       bulkInsertEvents(toInsert);
+
+       System.out.println("✅ Fast insert finished: " + LocalDate.now());
+   }
+
 
     public List<DividendEvent> getAllEvents() {
         return repository.findAll();
