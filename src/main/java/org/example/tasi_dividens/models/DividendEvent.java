@@ -23,5 +23,10 @@ public class DividendEvent {
     private LocalDate eventDate;
 
     private LocalDateTime createdAt = LocalDateTime.now();
+
+    private String companyName;
+
+    private Double amount;
+
 }
 
