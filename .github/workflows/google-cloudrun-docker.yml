@@ -32,7 +32,7 @@ name: 'Build and Deploy to Cloud Run'
 on:
   push:
     branches:
-      - '"Deploy-Cloud-Run"'
+      - '"main"'
 
 env:
   PROJECT_ID: 'personal-projects-456515'
