@@ -35,10 +35,10 @@ on:
       - '"Deploy-Cloud-Run"'
 
 env:
-  PROJECT_ID: 'my-project' # TODO: update to your Google Cloud project ID
-  REGION: 'us-central1' # TODO: update to your region
-  SERVICE: 'my-service' # TODO: update to your service name
-  WORKLOAD_IDENTITY_PROVIDER: 'projects/123456789/locations/global/workloadIdentityPools/my-pool/providers/my-provider' # TODO: update to your workload identity provider
+  PROJECT_ID: 'personal-projects-456515'
+  REGION: 'me-central1'
+  SERVICE: 'dividens-api'
+  WORKLOAD_IDENTITY_PROVIDER: 'projects/460632706650/locations/global/workloadIdentityPools/github/providers/LulwahAlmisfer/TASI_Dividens'
 
 jobs:
   deploy:
@@ -60,21 +60,12 @@ jobs:
         name: 'Authenticate to Google Cloud'
         uses: 'google-github-actions/auth@f112390a2df9932162083945e46d439060d66ec2' # google-github-actions/auth@v2
         with:
-          workload_identity_provider: '${{ env.WORKLOAD_IDENTITY_PROVIDER }}'
+          workload_identity_provider: 'projects/460632706650/locations/global/workloadIdentityPools/github/providers/LulwahAlmisfer/TASI_Dividens'
 
-      # BEGIN - Docker auth and build
-      #
-      # If you already have a container image, you can omit these steps.
-      - name: 'Docker Auth'
-        uses: 'docker/login-action@9780b0c442fbb1117ed29e0efdff1e18412f7567' # docker/login-action@v3
-        with:
-          username: 'oauth2accesstoken'
-          password: '${{ steps.auth.outputs.auth_token }}'
-          registry: '${{ env.REGION }}-docker.pkg.dev'
 
       - name: 'Build and Push Container'
         run: |-
-          DOCKER_TAG="$${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.SERVICE }}:${{ github.sha }}"
+          DOCKER_TAG="me-central1-docker.pkg.dev/personal-projects-456515/dividens-api:${{ github.sha }}"
           docker build --tag "${DOCKER_TAG}" .
           docker push "${DOCKER_TAG}"
       - name: 'Deploy to Cloud Run'
@@ -83,11 +74,11 @@ jobs:
 
         uses: 'google-github-actions/deploy-cloudrun@33553064113a37d688aa6937bacbdc481580be17' # google-github-actions/deploy-cloudrun@v2
         with:
-          service: '${{ env.SERVICE }}'
-          region: '${{ env.REGION }}'
+          service: 'dividens-api'
+          region: 'me-central1'
           # NOTE: If using a pre-built image, update the image name below:
 
-          image: '${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.SERVICE }}:${{ github.sha }}'
+          image: 'me-central1-docker.pkg.dev/personal-projects-456515/dividens-api:${{ github.sha }}'
       # If required, use the Cloud Run URL output in later steps
       - name: 'Show output'
         run: |2-
