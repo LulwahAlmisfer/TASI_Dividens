@@ -5,10 +5,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.example.tasi_dividens.models.DividendDto;
 import org.example.tasi_dividens.models.DividendEvent;
 import org.example.tasi_dividens.repositories.DividendEventRepository;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
 import org.springframework.http.*;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -18,9 +14,10 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class DividendsService {
@@ -97,42 +94,6 @@ public class DividendsService {
         return headers;
     }
 
-//    // TASI website uses AJAX so this is not useful
-//    public void scrape() throws IOException {
-//        String url = "https://www.saudiexchange.sa/wps/portal/saudiexchange/newsandreports/issuer-financial-calendars/dividends";
-//
-//        Document doc = Jsoup.connect(url)
-//                .userAgent("PostmanRuntime/7.43.2")
-//                .header("Media-Type","text/plain")
-//                .referrer("https://www.google.com")
-//                .header("Accept","*/*")
-//                .header("Accept-Encoding","gzip, deflate, br")
-//                .header("Connection","keep-alive")
-//                .cookie("h","d")
-//                .timeout(1000)
-//                .get();
-//
-//        Elements rows = doc.select("table tr");
-//        System.out.println(rows);
-//        for (Element row : rows) {
-//            Elements cols = row.select("td");
-//            System.out.println(cols);
-//        }
-//    }
-
-//    public void saveEventIfNotExists(String symbol, String type, LocalDate eventDate, String companyName, Double amount) {
-//        boolean exists = repository.existsBySymbolAndTypeAndEventDateAndAmount(symbol, type, eventDate,amount);
-//        if (!exists) {
-//            DividendEvent event = new DividendEvent();
-//            event.setSymbol(symbol);
-//            event.setType(type);
-//            event.setEventDate(eventDate);
-//            event.setCompanyName(companyName);
-//            event.setAmount(amount);
-//
-//            repository.save(event);
-//        }
-//    }
 
     public void bulkInsertEvents(List<DividendEvent> events) {
         String sql = "INSERT INTO dividend_events (symbol, type, event_date, company_name, amount) VALUES (?, ?, ?, ?, ?) " +
@@ -199,7 +160,11 @@ public class DividendsService {
 
 
     public List<DividendEvent> getAllEvents() {
-        return repository.findAll();
+        return repository.findAll()
+                .stream()
+                .sorted(Comparator.comparing(DividendEvent::getEventDate).reversed())
+                .collect(Collectors.toList());
     }
+
 
 }
