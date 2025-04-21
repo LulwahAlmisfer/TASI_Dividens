@@ -146,36 +146,56 @@ public class DividendsService {
     }
 
 
-   @Scheduled(cron = "${dividends.job.cron}")
-   public void fetchAndStoreDividendEvents() {
-       List<DividendDto> data = fetchDividendDetails();
+    @Scheduled(cron = "${dividends.job.cron}")
+    public void fetchAndStoreDividendEvents() {
+        List<DividendDto> data = fetchDividendDetails();
 
-       List<DividendEvent> toInsert = new ArrayList<>();
+        LocalDate oneYearAgo = LocalDate.now().minusYears(1);
 
-       for (DividendDto dto : data) {
-           String symbol = dto.getSymbol();
-           String companyName = dto.getCompanyShotName();
-           Double amount = dto.getAmount();
+        List<DividendDto> filteredData = data.stream()
+                .filter(dto -> {
+                    try {
+                        if (dto.getDueDate() != null && !dto.getDueDate().isBlank()) {
+                            LocalDate due = LocalDate.parse(dto.getDueDate());
+                            if (!due.isBefore(oneYearAgo)) return true;
+                        }
 
-           if (dto.getDueDate() != null && !dto.getDueDate().isBlank()) {
-               try {
-                   LocalDate due = LocalDate.parse(dto.getDueDate());
-                   toInsert.add(new DividendEvent(symbol, "dueDate", due, companyName, amount));
-               } catch (Exception ignored) {}
-           }
+                        if (dto.getDistributionDate() != null && !dto.getDistributionDate().isBlank()) {
+                            LocalDate dist = LocalDate.parse(dto.getDistributionDate());
+                            if (!dist.isBefore(oneYearAgo)) return true;
+                        }
+                    } catch (Exception ignored) {}
 
-           if (dto.getDistributionDate() != null && !dto.getDistributionDate().isBlank()) {
-               try {
-                   LocalDate dist = LocalDate.parse(dto.getDistributionDate());
-                   toInsert.add(new DividendEvent(symbol, "distributionDate", dist, companyName, amount));
-               } catch (Exception ignored) {}
-           }
-       }
+                    return false;
+                })
+                .toList();
 
-       bulkInsertEvents(toInsert);
+        List<DividendEvent> toInsert = new ArrayList<>();
 
-       System.out.println("✅ Fast insert finished: " + LocalDate.now());
-   }
+        for (DividendDto dto : filteredData) {
+            String symbol = dto.getSymbol();
+            String companyName = dto.getCompanyShotName();
+            Double amount = dto.getAmount();
+
+            if (dto.getDueDate() != null && !dto.getDueDate().isBlank()) {
+                try {
+                    LocalDate due = LocalDate.parse(dto.getDueDate());
+                    toInsert.add(new DividendEvent(symbol, "dueDate", due, companyName, amount));
+                } catch (Exception ignored) {}
+            }
+
+            if (dto.getDistributionDate() != null && !dto.getDistributionDate().isBlank()) {
+                try {
+                    LocalDate dist = LocalDate.parse(dto.getDistributionDate());
+                    toInsert.add(new DividendEvent(symbol, "distributionDate", dist, companyName, amount));
+                } catch (Exception ignored) {}
+            }
+        }
+
+        bulkInsertEvents(toInsert);
+        System.out.println("✅ Fast insert finished: " + LocalDate.now());
+    }
+
 
 
     public List<DividendEvent> getAllEvents() {
