@@ -32,12 +32,28 @@ public class DividendEvent {
 
     private Double amount;
 
+    private String holdingTime;
+    private String holdingSite;
+    private String holdingType;
+
+
     public DividendEvent(String symbol, String type, LocalDate eventDate, String companyName, Double amount) {
         this.symbol = symbol;
         this.type = type;
         this.eventDate = eventDate;
         this.companyName = companyName;
         this.amount = amount;
+    }
+
+    public DividendEvent( String symbol, String type, LocalDate eventDate, String companyName, Double amount, String holdingTime, String holdingSite, String holdingType) {
+        this.symbol = symbol;
+        this.type = type;
+        this.eventDate = eventDate;
+        this.companyName = companyName;
+        this.amount = amount;
+        this.holdingTime = holdingTime;
+        this.holdingSite = holdingSite;
+        this.holdingType = holdingType;
     }
 
     @JsonProperty("imageUrl")
