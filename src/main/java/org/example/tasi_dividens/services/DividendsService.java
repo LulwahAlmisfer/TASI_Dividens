@@ -2,6 +2,8 @@ package org.example.tasi_dividens.services;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.extern.log4j.Log4j;
+import lombok.extern.slf4j.Slf4j;
 import org.example.tasi_dividens.models.AssemblyDto;
 import org.example.tasi_dividens.models.DividendDto;
 import org.example.tasi_dividens.models.DividendEvent;
@@ -20,6 +22,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 public class DividendsService {
 
@@ -160,7 +163,7 @@ public class DividendsService {
 
     @Scheduled(cron = "${dividends.job.cron}")
     public void fetchAndStoreDividendEvents() {
-        System.out.println("start fetchAndStoreDividendEvents");
+        log.info("start fetchAndStoreDividendEvents");
 
         List<DividendDto> data = fetchDividendDetails();
 
@@ -213,7 +216,8 @@ public class DividendsService {
 
     @Scheduled(cron = "${dividends.job.cron}")
     public void fetchAndStoreAssemblyEvents() {
-        System.out.println("start fetchAndStoreAssemblyEvents");
+        log.info("start fetchAndStoreAssemblyEvents");
+
         List<AssemblyDto> data = fetchAssemblyDetails();
 
         LocalDate oneYearAgo = LocalDate.now().minusYears(1);
@@ -256,7 +260,7 @@ public class DividendsService {
         }
 
         bulkInsertEvents(toInsert);
-        System.out.println("✅ Fast insert finished: " + LocalDate.now());
+        log.info("✅ Fast insert finished: {}", LocalDate.now());
     }
 
     public List<DividendEvent> getAllEvents() {
