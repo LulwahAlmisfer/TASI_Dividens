@@ -60,7 +60,7 @@ public class DividendEvent {
 
     @JsonProperty("imageUrl")
     public String getImageUrl() {
-        return "https://cdn.marketcapof.com/images/" + symbol + ".SR.png";
+        return "https://www.tadawulgroup.sa/Resources/SEMOBILELOGOS/" + symbol + ".png";
     }
 
     public String getTypeTitle() {
