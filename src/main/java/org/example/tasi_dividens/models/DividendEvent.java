@@ -8,6 +8,8 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Objects;
+
 @Data
 @Entity
 @NoArgsConstructor
@@ -59,6 +61,32 @@ public class DividendEvent {
     @JsonProperty("imageUrl")
     public String getImageUrl() {
         return "https://cdn.marketcapof.com/images/" + symbol + ".SR.png";
+    }
+
+    public String getTypeTitle() {
+        String title = "إعلان ";
+
+         switch (type) {
+            case "dueDate" -> title += "إستحقاق توزيع";
+            case "distributionDate" -> title += "توزيع ارباح";
+            case "assembly" -> title += "جمعية";
+            default -> title += "";
+        }
+
+         return title;
+    }
+
+    public String getTypeDescription() {
+        String Description = "";
+
+        switch (type) {
+            case "dueDate" -> Description += ("الربح الموزع " + getAmount());
+            case "distributionDate" -> Description += ("الربح الموزع " + getAmount());
+            case "assembly" -> Description += Objects.equals(getHoldingType(), "natural") ? "جمعية عادية" : "جمعية غير عادية" ;
+            default -> Description += "";
+        }
+
+        return Description;
     }
 }
 
