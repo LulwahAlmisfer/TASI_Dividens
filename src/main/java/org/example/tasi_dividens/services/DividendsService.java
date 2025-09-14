@@ -66,13 +66,13 @@ public class DividendsService {
 
     }
 
-    public List<AssemblyDto> fetchAssemblyDetails() {
+    public List<AssemblyDto> fetchAssemblyDetails(String marketsListId) {
         String url = "https://www.saudiexchange.sa/wps/portal/saudiexchange/newsandreports/issuer-financial-calendars/general-assembly-meetings/!ut/p/z1/04_Sj9CPykssy0xPLMnMz0vMAfIjo8ziTR3NDIw8LAz8LTw8zA0C3bw9LTyDvAwMQgz0w9EU-LqbGQT6OQb6G5mbGriHGehHkaTfIDjAFKggwNfYxyDIwN3AjDj9BjiAIxH2R-FV4mOGoQDTi6gKsPgBrACPI4MTi_QLckNDIwwyPXUdFRUBAn6bmA!!/p0/IZ7_5A602H80OOMQC0604RU6VD10J2=CZ6_5A602H80O8HH70QFKI8IRJ00T0=NJgetGenAssemblyDetails=/";
 
         // Request Body todo clean  clients should be in separate class
         MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();
         formData.add("searchType", "searchData");
-        formData.add("marketsListId", "M");
+        formData.add("marketsListId", marketsListId);
         LocalDate yesterday = LocalDate.now().minusDays(1);
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
         formData.add("fromDate", yesterday.format(formatter));
@@ -225,7 +225,8 @@ public class DividendsService {
     public void fetchAndStoreAssemblyEvents() {
         log.info("start fetchAndStoreAssemblyEvents");
 
-        List<AssemblyDto> data = fetchAssemblyDetails();
+        List<AssemblyDto> data = fetchAssemblyDetails("M");
+        data.addAll(fetchAssemblyDetails("S"));
 
         LocalDate oneYearAgo = LocalDate.now().minusYears(1);
 
