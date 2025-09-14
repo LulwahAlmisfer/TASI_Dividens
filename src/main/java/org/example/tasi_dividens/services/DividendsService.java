@@ -42,11 +42,12 @@ public class DividendsService {
     }
 
 
-    public List<DividendDto> fetchDividendDetails() {
+    public List<DividendDto> fetchDividendDetails(String marketsListId) {
         String url = "https://www.saudiexchange.sa/wps/portal/saudiexchange/newsandreports/issuer-financial-calendars/dividends/!ut/p/z1/04_Sj9CPykssy0xPLMnMz0vMAfIjo8ziTR3NDIw8LAz8LTw8zA0C3bw9LTyDvAwMAoz1w9EU-LqbGQT6OQb6G5mbGriHGehHkaTfIDjAFKggwNfYxyDIwN3AjDj9BjiAIxH2R-FV4mOGoQDTi6gKsPgBrACPI4MTi_QLckNDIwwyPXUdFRUBgmVDWw!!/p0/IZ7_5A602H80OOMQC0604RU6VD10J3=CZ6_5A602H80O8HH70QFKI8IRJ00P3=NJgetDividendsDetails=/";
+        System.out.println("market id: " + marketsListId);
 
         // Body
-        MultiValueMap<String, String> formData = getDividendDetailsBody();
+        MultiValueMap<String, String> formData = getDividendDetailsBody(marketsListId);
         // Headers
         HttpHeaders headers = getHttpHeaders();
 
@@ -117,13 +118,13 @@ public class DividendsService {
     }
 
 
-    private static MultiValueMap<String, String> getDividendDetailsBody() {
+    private static MultiValueMap<String, String> getDividendDetailsBody(String marketsListId) {
         MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();
         formData.add("symbolorcompany", "");
         formData.add("start", "05-03-2020");
         String today = LocalDate.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy"));
         formData.add("end", today);
-        formData.add("marketsListId", "M");
+        formData.add("marketsListId", marketsListId);
         formData.add("sector", "");
         formData.add("period", "CUSTOM");
         formData.add("bySymbol", "");
@@ -169,7 +170,9 @@ public class DividendsService {
     public void fetchAndStoreDividendEvents() {
         log.info("start fetchAndStoreDividendEvents");
 
-        List<DividendDto> data = fetchDividendDetails();
+        List<DividendDto> data = fetchDividendDetails("S");
+        data.addAll(fetchDividendDetails("M"));
+
 
         LocalDate oneYearAgo = LocalDate.now().minusYears(1);
 
