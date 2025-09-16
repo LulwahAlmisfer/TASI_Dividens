@@ -60,17 +60,25 @@ public class SubscriptionService {
 
             log.info("to be notify : {}",subs.size());
 
+
             for (DeviceSubscription sub : subs) {
                 log.info("to be notify token : {} for company: {}", sub.getDeviceToken(), sub.getCompanySymbol());
 
-                pushService.sendPush(
-                        sub.getDeviceToken(),
-                        event.getTypeTitle() + " - " + event.getCompanyName(),
-                        event.getTypeDescription(),
-                        "",
-                        "com.LulwahAlmisfer.Compounded"
-                );
+                try {
+                    pushService.sendPush(
+                            sub.getDeviceToken(),
+                            event.getTypeTitle() + " - " + event.getCompanyName(),
+                            event.getTypeDescription(),
+                            "",
+                            "com.LulwahAlmisfer.Compounded"
+                    );
+
+                    Thread.sleep(100);
+                } catch (Exception e) {
+                    log.error("Failed to send push to {}: {}", sub.getDeviceToken(), e.getMessage());
+                }
             }
+
         }
     }
 
