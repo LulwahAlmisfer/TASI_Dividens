@@ -28,39 +28,42 @@ public class PushNotificationService {
 
             URI uri = URI.create(appleUrl + deviceToken);
             String jsonRequest = String.format("""
-                          {
-                             "aps" : {
-                                "alert" : {
-                                  "title" : "%s",
-                                  "body" : "%s"
-                                },
-                    "sound" : "default"
-                             },
-                             "link": "%s"
-                          }
-                          """, title, body, link);
+          {
+             "aps": {
+                "alert": {
+                  "title": "%s",
+                  "body": "%s"
+                },
+                "sound": "default"
+             },
+             "link": "%s"
+          }
+        """, title, body, link);
 
             String token = JWT.getApnJwtToken(key, keyId, teamId);
 
-
-            HttpRequest httpRequest = HttpRequest.newBuilder(uri).POST(HttpRequest.BodyPublishers.ofString(jsonRequest))
-                    .header("authorization", "Bearer " + token)
-                    .header("apns-topic", topic)
+            HttpClient httpClient = HttpClient.newBuilder()
+                    .version(HttpClient.Version.HTTP_2)
                     .build();
 
+            HttpRequest httpRequest = HttpRequest.newBuilder(uri)
+                    .POST(HttpRequest.BodyPublishers.ofString(jsonRequest))
+                    .header("authorization", "bearer " + token)
+                    .header("apns-topic", topic)
+                    .header("apns-push-type", "alert")
+                    .build();
 
-            var response = HttpClient.newHttpClient().send(httpRequest, HttpResponse.BodyHandlers.ofString());
-
-
+            var response = httpClient.send(httpRequest, HttpResponse.BodyHandlers.ofString());
 
             if (response.statusCode() == 200) {
                 System.out.println("Success");
             } else {
-                System.err.println("Error: " + response.body());
+                System.err.printf("APNs error: status=%d, body=%s%n", response.statusCode(), response.body());
             }
         } catch (Exception e) {
-            System.err.println(e);
+            e.printStackTrace();
         }
     }
+
 }
 
