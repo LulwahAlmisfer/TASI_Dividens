@@ -61,7 +61,7 @@ public class SubscriptionService {
             log.info("to be notify : {}",subs.size());
 
             for (DeviceSubscription sub : subs) {
-                log.info("to be notify token : {}", sub.getDeviceToken());
+                log.info("to be notify token : {} for company: {}", sub.getDeviceToken(), sub.getCompanySymbol());
 
                 pushService.sendPush(
                         sub.getDeviceToken(),
