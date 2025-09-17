@@ -58,7 +58,9 @@ public class SubscriptionService {
                     (rs, rowNum) -> new DeviceSubscription(rs.getString("device_token"), rs.getString("company_symbol"))
             );
 
-            log.info("to be notify : {}",subs.size());
+
+
+            log.info("company {} subscribed count {}",event.getCompanyName() + " - " + event.getSymbol(),subs.size());
 
 
             for (DeviceSubscription sub : subs) {

@@ -1,5 +1,6 @@
 package org.example.tasi_dividens.services;
 
+import lombok.extern.log4j.Log4j2;
 import org.example.tasi_dividens.helpers.JWT;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -7,7 +8,7 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-
+@Log4j2
 @Service
 public class PushNotificationService {
 
@@ -42,8 +43,8 @@ public class PushNotificationService {
 
             String token = JWT.getApnJwtToken(key, keyId, teamId);
 
-            HttpClient httpClient = HttpClient.newBuilder()
-                    .version(HttpClient.Version.HTTP_2)
+            HttpClient httpClient = HttpClient
+                    .newBuilder()
                     .build();
 
             HttpRequest httpRequest = HttpRequest.newBuilder(uri)
@@ -56,12 +57,12 @@ public class PushNotificationService {
             var response = httpClient.send(httpRequest, HttpResponse.BodyHandlers.ofString());
 
             if (response.statusCode() == 200) {
-                System.out.println("Success");
+                log.info("Success");
             } else {
-                System.err.printf("APNs error: status=%d, body=%s%n", response.statusCode(), response.body());
+                log.error("APNs error: status=%d, body=%s%n", response.statusCode(), response.body());
             }
         } catch (Exception e) {
-            e.printStackTrace();
+           log.error(e.getStackTrace());
         }
     }
 
