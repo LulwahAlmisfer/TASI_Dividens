@@ -163,6 +163,7 @@ public class DividendsService {
                 .toList();
 
         jdbcTemplate.batchUpdate(sql, batch);
+        log.info("Inserted {} events into database", events.size());
     }
 
 
