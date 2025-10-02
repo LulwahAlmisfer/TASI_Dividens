@@ -14,6 +14,7 @@ public class AssemblyDto {
     private String holdingDt;
     private String holdingTime;
     private String holdingSite;
+    private String annUrl;
 
 }
 
