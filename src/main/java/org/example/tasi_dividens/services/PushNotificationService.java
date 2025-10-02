@@ -52,6 +52,7 @@ public class PushNotificationService {
                     .header("authorization", "bearer " + token)
                     .header("apns-topic", topic)
                     .header("apns-push-type", "alert")
+                    .header("apns-priority","10")
                     .build();
 
             var response = httpClient.send(httpRequest, HttpResponse.BodyHandlers.ofString());
@@ -59,7 +60,7 @@ public class PushNotificationService {
             if (response.statusCode() == 200) {
                 log.info("Success");
             } else {
-                log.error("APNs error: status=%d, body=%s%n", response.statusCode(), response.body());
+                log.error("APNs error: status={}, body={}", response.statusCode(), response.body());
             }
         } catch (Exception e) {
            log.error(e.getStackTrace());
