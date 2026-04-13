@@ -63,7 +63,7 @@ public class PushNotificationService {
                 log.error("APNs error: status={}, body={}", response.statusCode(), response.body());
             }
         } catch (Exception e) {
-           log.error(e.getStackTrace());
+           log.error("Failed to send push to {}: {}", deviceToken, e.getMessage(), e);
         }
     }
 

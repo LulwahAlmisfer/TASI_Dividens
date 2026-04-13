@@ -90,14 +90,15 @@ public class DividendsService {
         headers.set("origin", "https://www.saudiexchange.sa");
         headers.set("priority", "u=1, i");
         headers.set("referer", "https://www.saudiexchange.sa/wps/portal/saudiexchange/newsandreports/issuer-financial-calendars/general-assembly-meetings");
-        headers.set("sec-ch-ua", "\"Not(A:Brand\";v=\"8\", \"Chromium\";v=\"144\"");
+        headers.set("sec-ch-ua", "\"Chromium\";v=\"147\", \"Not.A/Brand\";v=\"8\"");
         headers.set("sec-ch-ua-mobile", "?0");
         headers.set("sec-ch-ua-platform", "\"macOS\"");
         headers.set("sec-fetch-dest", "empty");
         headers.set("sec-fetch-mode", "cors");
         headers.set("sec-fetch-site", "same-origin");
-        headers.set("user-agent", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36");
+        headers.set("user-agent", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36");
         headers.set("x-requested-with", "XMLHttpRequest");
+        headers.set("cookie", "_ga=GA1.1.671128077.1770319640; BIGipServerSaudiExchange.sa.app~SaudiExchange.sa_pool=2600407468.20480.0000; com.ibm.wps.state.preprocessors.locale.LanguageCookie=ar; marqueePosition_ltr=-1834.7919999999976; JSESSIONID=!er7/PMeSU6vW7q9JkmmjrB1xdL66i4aMgo6FNsV5GbuO1CTEVS7/RHBbVYf2S7lok9/XbXPMqI2dZ/nEDzGnSlT4FN2A8w0JPUw3; TS01fdeb15=0102d17fad16d84a7fd1edb83b46229f482b846469fe2ff5625711c16db30ca4c5486fb062f18beb1ccaa35b79e123b8816888470745dc0d30320a514a1fa1df39bf93716c73b9d842bb1bcbbe6876e6f1a4c46284a355183358fe9a8872f9eac7439c0150; marqueePosition_rtl=5218.096000000129; RT=\"z=1&dm=www.saudiexchange.sa&si=216a9594-87cd-42fb-bb2a-cd3f73bd32f4&ss=mnuptt0k&sl=4&tt=bhh&obo=2&rl=1\"; _ga_P0MCK0BGCX=GS2.1.s1775934980$o3$g1$t1775935075$j60$l0$h0; _ga_DC6H7ZFCGP=GS2.1.s1775934980$o3$g1$t1775935075$j60$l0$h0; _ga_3T6X01KMEX=GS2.1.s1775934981$o1$g1$t1775935075$j60$l0$h0");
 
         HttpEntity<MultiValueMap<String, String>> requestEntity = new HttpEntity<>(formData, headers);
 
@@ -136,14 +137,15 @@ public class DividendsService {
         headers.set("origin", "https://www.saudiexchange.sa");
         headers.set("priority", "u=1, i");
         headers.set("referer", "https://www.saudiexchange.sa/wps/portal/saudiexchange/newsandreports/issuer-financial-calendars/dividends?locale=ar");
-        headers.set("sec-ch-ua", "\"Not(A:Brand\";v=\"8\", \"Chromium\";v=\"144\"");
+        headers.set("sec-ch-ua", "\"Chromium\";v=\"147\", \"Not.A/Brand\";v=\"8\"");
         headers.set("sec-ch-ua-mobile", "?0");
         headers.set("sec-ch-ua-platform", "\"macOS\"");
         headers.set("sec-fetch-dest", "empty");
         headers.set("sec-fetch-mode", "cors");
         headers.set("sec-fetch-site", "same-origin");
-        headers.set("user-agent", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36");
+        headers.set("user-agent", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36");
         headers.set("x-requested-with", "XMLHttpRequest");
+        headers.set("cookie", "_ga=GA1.1.671128077.1770319640; BIGipServerSaudiExchange.sa.app~SaudiExchange.sa_pool=2600407468.20480.0000; com.ibm.wps.state.preprocessors.locale.LanguageCookie=ar; marqueePosition_ltr=-1834.7919999999976; JSESSIONID=!er7/PMeSU6vW7q9JkmmjrB1xdL66i4aMgo6FNsV5GbuO1CTEVS7/RHBbVYf2S7lok9/XbXPMqI2dZ/nEDzGnSlT4FN2A8w0JPUw3; TS01fdeb15=0102d17fad16d84a7fd1edb83b46229f482b846469fe2ff5625711c16db30ca4c5486fb062f18beb1ccaa35b79e123b8816888470745dc0d30320a514a1fa1df39bf93716c73b9d842bb1bcbbe6876e6f1a4c46284a355183358fe9a8872f9eac7439c0150; marqueePosition_rtl=5218.096000000129; RT=\"z=1&dm=www.saudiexchange.sa&si=216a9594-87cd-42fb-bb2a-cd3f73bd32f4&ss=mnuptt0k&sl=4&tt=bhh&obo=2&rl=1\"; _ga_P0MCK0BGCX=GS2.1.s1775934980$o3$g1$t1775935075$j60$l0$h0; _ga_DC6H7ZFCGP=GS2.1.s1775934980$o3$g1$t1775935075$j60$l0$h0; _ga_3T6X01KMEX=GS2.1.s1775934981$o1$g1$t1775935075$j60$l0$h0");
         return headers;
     }
 
@@ -153,7 +155,11 @@ public class DividendsService {
                 "ON CONFLICT (symbol, type, event_date) DO NOTHING";
 
         List<Object[]> batch = events.stream()
-                .map(e -> new Object[]{e.getSymbol(), e.getType(), e.getEventDate(), e.getCompanyName(), e.getAmount(),e.getHoldingTime(),e.getHoldingSite(),e.getHoldingType(), e.getAnnurl()})
+                .map(e -> {
+                    String site = e.getHoldingSite();
+                    if (site != null && site.length() > 255) site = site.substring(0, 255);
+                    return new Object[]{e.getSymbol(), e.getType(), e.getEventDate(), e.getCompanyName(), e.getAmount(), e.getHoldingTime(), site, e.getHoldingType(), e.getAnnurl()};
+                })
                 .toList();
 
         jdbcTemplate.batchUpdate(sql, batch);
@@ -165,7 +171,7 @@ public class DividendsService {
     public void fetchAndStoreDividendEvents() {
         log.info("start fetchAndStoreDividendEvents");
 
-        List<DividendDto> data = fetchDividendDetails("S");
+        List<DividendDto> data = new ArrayList<>(fetchDividendDetails("S"));
         data.addAll(fetchDividendDetails("M"));
 
 
@@ -220,7 +226,7 @@ public class DividendsService {
     public void fetchAndStoreAssemblyEvents() {
         log.info("start fetchAndStoreAssemblyEvents");
 
-        List<AssemblyDto> data = fetchAssemblyDetails("M");
+        List<AssemblyDto> data = new ArrayList<>(fetchAssemblyDetails("M"));
         data.addAll(fetchAssemblyDetails("S"));
 
         LocalDate oneYearAgo = LocalDate.now().minusYears(1);
